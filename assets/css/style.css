@@ -1,0 +1,230 @@
+/* ============================================================
+   HONGTAI PRECISION HARDWARE 鈥� design tokens
+   Palette: graphite + brass, blueprint/technical-drawing motif
+   Type: Space Grotesk (display) / Inter (body) / IBM Plex Mono (specs)
+   ============================================================ */
+
+:root{
+  --bg-0: #101317;         /* deepest background */
+  --bg-1: #15181d;         /* page background */
+  --bg-panel: #1b1f25;     /* card / panel */
+  --bg-panel-raised: #21262e;
+  --line: #2c333b;         /* hairline rules */
+  --line-strong: #3a434d;
+  --text-0: #eef1f3;       /* primary text */
+  --text-1: #aab2bb;       /* secondary text */
+  --text-2: #6c7580;       /* muted / captions */
+  --brass: #c69a4e;        /* signature accent */
+  --brass-dim: #8a6f3c;
+  --brass-glow: rgba(198,154,78,0.16);
+  --ok: #6fae7a;
+
+  --display: 'Space Grotesk', 'Arial Narrow', sans-serif;
+  --body: 'Inter', -apple-system, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --max: 1180px;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--bg-1);
+  color:var(--text-0);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none;}
+img{max-width:100%;display:block;}
+
+::selection{background:var(--brass-glow);color:var(--text-0);}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+}
+
+/* ---------- layout shells ---------- */
+.wrap{max-width:var(--max); margin:0 auto; padding:0 28px;}
+
+.site-header{
+  position:sticky; top:0; z-index:40;
+  background:rgba(16,19,23,0.86);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.site-header .wrap{
+  height:72px; display:flex; align-items:center; justify-content:space-between;
+}
+.brand{
+  display:flex; align-items:center; gap:12px;
+  font-family:var(--display); font-weight:600; font-size:18px; letter-spacing:0.02em;
+}
+.brand .mark{
+  width:30px;height:30px; border:1.5px solid var(--brass); border-radius:3px;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--brass); font-family:var(--mono); font-size:12px;
+}
+.brand .sub{color:var(--text-2); font-family:var(--mono); font-size:11px; font-weight:400; letter-spacing:0.08em; text-transform:uppercase;}
+
+.nav-links{display:flex; gap:28px; font-size:14px; color:var(--text-1);}
+.nav-links a{transition:color .15s;}
+.nav-links a:hover{color:var(--brass);}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:12px 22px; border-radius:2px;
+  font-family:var(--body); font-size:14px; font-weight:600;
+  border:1px solid var(--brass); color:var(--bg-1); background:var(--brass);
+  cursor:pointer; transition:all .15s;
+}
+.btn:hover{background:transparent; color:var(--brass);}
+.btn.ghost{background:transparent; color:var(--text-0); border-color:var(--line-strong);}
+.btn.ghost:hover{border-color:var(--brass); color:var(--brass);}
+
+/* ---------- eyebrow / labels ---------- */
+.eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:0.14em; text-transform:uppercase;
+  color:var(--brass); display:flex; align-items:center; gap:10px;
+}
+.eyebrow::before{content:""; width:22px; height:1px; background:var(--brass);}
+
+/* ---------- footer ---------- */
+.site-footer{
+  border-top:1px solid var(--line); margin-top:120px;
+  padding:48px 0; color:var(--text-2); font-size:13px;
+}
+.site-footer .wrap{display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;}
+.site-footer .cols{display:flex; gap:56px; flex-wrap:wrap;}
+.site-footer h4{font-family:var(--mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-1); margin:0 0 12px;}
+.site-footer p{margin:4px 0;}
+
+/* ---------- blueprint diagram (signature element) ---------- */
+.blueprint{
+  border:1px solid var(--line-strong);
+  background:
+    linear-gradient(var(--bg-0), var(--bg-0)) padding-box,
+    repeating-linear-gradient(0deg, transparent, transparent 27px, var(--line) 27px, var(--line) 28px),
+    repeating-linear-gradient(90deg, transparent, transparent 27px, var(--line) 27px, var(--line) 28px);
+  position:relative;
+  border-radius:2px;
+}
+.blueprint svg{display:block; width:100%; height:auto;}
+.blueprint .callout-label{
+  font-family:var(--mono); font-size:11px; fill:var(--text-1); letter-spacing:0.02em;
+}
+.blueprint .callout-line{stroke:var(--line-strong); stroke-width:1;}
+.blueprint .draw-line{
+  stroke:var(--brass); stroke-width:1.6; fill:none;
+  stroke-dasharray:900; stroke-dashoffset:900;
+  animation:draw 2.2s ease forwards;
+}
+.blueprint .draw-line.d2{animation-delay:.25s;}
+.blueprint .draw-line.d3{animation-delay:.5s;}
+.blueprint .fill-part{fill:var(--bg-panel-raised); stroke:var(--text-2); stroke-width:1; opacity:0; animation:fadein .6s ease forwards; animation-delay:1.1s;}
+@keyframes draw{to{stroke-dashoffset:0;}}
+@keyframes fadein{to{opacity:1;}}
+
+/* ---------- hero ---------- */
+.hero{padding:72px 0 56px;}
+.hero-grid{display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px; align-items:center;}
+.hero h1{
+  font-family:var(--display); font-weight:600; font-size:clamp(34px,4.4vw,54px);
+  line-height:1.08; margin:18px 0 20px; letter-spacing:-0.01em;
+}
+.hero h1 em{font-style:normal; color:var(--brass);}
+.hero p.lede{color:var(--text-1); font-size:17px; max-width:46ch; margin:0 0 32px;}
+.hero .cta-row{display:flex; gap:14px; flex-wrap:wrap;}
+
+/* ---------- stat strip ---------- */
+.stat-strip{
+  display:grid; grid-template-columns:repeat(4,1fr);
+  border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+  margin-top:64px;
+}
+.stat{padding:26px 24px; border-right:1px solid var(--line);}
+.stat:last-child{border-right:none;}
+.stat .num{font-family:var(--mono); font-size:26px; color:var(--brass);}
+.stat .label{font-size:12.5px; color:var(--text-2); margin-top:6px;}
+
+/* ---------- catalog grid ---------- */
+.section{padding:80px 0;}
+.section-head{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:40px; gap:24px; flex-wrap:wrap;}
+.section-head h2{font-family:var(--display); font-size:30px; font-weight:600; margin:14px 0 0;}
+.section-head p{color:var(--text-1); max-width:52ch; margin:8px 0 0; font-size:14.5px;}
+
+.catalog-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+.cat-card{
+  background:var(--bg-panel); padding:30px 26px; position:relative;
+  transition:background .18s;
+}
+.cat-card:hover{background:var(--bg-panel-raised);}
+.cat-card .idx{font-family:var(--mono); color:var(--text-2); font-size:12px;}
+.cat-card h3{font-family:var(--display); font-size:19px; font-weight:600; margin:14px 0 8px;}
+.cat-card p{color:var(--text-1); font-size:13.5px; margin:0 0 18px; min-height:38px;}
+.cat-card .go{
+  display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--brass);
+  font-family:var(--mono);
+}
+.cat-card .go .arrow{transition:transform .15s;}
+.cat-card:hover .go .arrow{transform:translateX(4px);}
+
+/* ---------- markets strip ---------- */
+.markets{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px;}
+.market-tag{
+  border:1px solid var(--line-strong); padding:7px 14px; border-radius:2px;
+  font-family:var(--mono); font-size:12px; color:var(--text-1);
+}
+
+/* ---------- product detail page ---------- */
+.breadcrumb{font-family:var(--mono); font-size:12px; color:var(--text-2); padding-top:28px;}
+.breadcrumb a:hover{color:var(--brass);}
+
+.product-head{display:grid; grid-template-columns:1fr 1fr; gap:56px; padding:36px 0 60px; align-items:start;}
+.gallery-main{
+  aspect-ratio:4/3; background:var(--bg-panel); border:1px solid var(--line);
+  display:flex; align-items:center; justify-content:center; color:var(--text-2);
+  font-family:var(--mono); font-size:13px; overflow:hidden;
+}
+.gallery-thumbs{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:8px;}
+.gallery-thumbs div{
+  aspect-ratio:1; background:var(--bg-panel); border:1px solid var(--line);
+  display:flex; align-items:center; justify-content:center; color:var(--text-2); font-size:10px; font-family:var(--mono);
+}
+
+.product-info h1{font-family:var(--display); font-size:32px; font-weight:600; margin:12px 0 10px;}
+.product-info .tagline{color:var(--text-1); font-size:15px; margin:0 0 26px;}
+
+.spec-table{width:100%; border-collapse:collapse; font-family:var(--mono); font-size:13px; margin-bottom:28px;}
+.spec-table tr{border-bottom:1px solid var(--line);}
+.spec-table td{padding:11px 0; vertical-align:top;}
+.spec-table td:first-child{color:var(--text-2); width:42%;}
+.spec-table td:last-child{color:var(--text-0);}
+
+.info-actions{display:flex; gap:12px; margin-top:8px; flex-wrap:wrap;}
+
+.detail-tabs{display:flex; gap:0; border-bottom:1px solid var(--line); margin-top:20px;}
+.detail-tabs .tab{
+  padding:12px 0; margin-right:32px; font-size:13.5px; color:var(--text-2);
+  border-bottom:2px solid transparent; cursor:pointer; font-family:var(--mono);
+}
+.detail-tabs .tab.active{color:var(--brass); border-color:var(--brass);}
+
+.tracking-note{
+  margin-top:18px; padding:14px 16px; background:var(--bg-panel);
+  border-left:2px solid var(--brass); font-size:12.5px; color:var(--text-2); font-family:var(--mono);
+}
+
+/* ---------- responsive ---------- */
+@media (max-width:860px){
+  .hero-grid{grid-template-columns:1fr;}
+  .stat-strip{grid-template-columns:repeat(2,1fr);}
+  .stat:nth-child(2){border-right:none;}
+  .catalog-grid{grid-template-columns:1fr;}
+  .product-head{grid-template-columns:1fr;}
+  .nav-links{display:none;}
+  .site-footer .wrap{flex-direction:column;}
+}
