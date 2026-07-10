@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">Category — Hongtai Precision Hardware</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  .state-msg{font-family:var(--mono); font-size:13px; color:var(--text-2); padding:60px 0; text-align:center;}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a href="index.html" class="brand">
+      <span class="mark">HT</span>
+      <span>Hongtai<span class="sub" style="display:block;margin-top:2px;">Precision Hardware</span></span>
+    </a>
+    <nav class="nav-links">
+      <a href="category.html?type=hinge">Hinges</a>
+      <a href="category.html?type=slide">Slides</a>
+      <a href="category.html?type=stopper">Door Stopper</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+    <a class="btn ghost" href="index.html#contact">Request a quote</a>
+  </div>
+</header>
+
+<div class="wrap breadcrumb">
+  <a href="index.html">Catalog</a> / <span id="crumb-name">Loading…</span>
+</div>
+
+<section class="section" style="padding-top:20px;">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow" id="cat-eyebrow">Category</div>
+        <h2 id="cat-title">Loading…</h2>
+      </div>
+    </div>
+    <div id="grid" class="catalog-grid"></div>
+  </div>
+</section>
+
+<footer class="site-footer" id="contact">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h4>Company</h4>
+        <p>Guangdong Hongtai Precision Hardware Co., Ltd</p>
+        <p>Pandong Chengxi Community, Jieyang Industrial Transfer Industrial Park</p>
+        <p>Jieyang, Guangdong, China</p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>WhatsApp: +86 18320561551</p>
+        <p>Email: melody_rongxinghardware@hotmail.com</p>
+      </div>
+    </div>
+    <div style="align-self:flex-end;font-family:var(--mono);">© Hongtai Precision Hardware</div>
+  </div>
+</footer>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const type = params.get("type") || "hinge";
+  const cidParam = params.get("cid"); // preserved and passed through to each product link if present
+  const grid = document.getElementById("grid");
+  const titleEl = document.getElementById("cat-title");
+  const crumbEl = document.getElementById("crumb-name");
+  const eyebrowEl = document.getElementById("cat-eyebrow");
+
+  const LABELS = {
+    hinge: "Hinges",
+    slide: "Drawer Slides",
+    stopper: "Door Stopper",
+    gasspring: "Gas Spring / Lift",
+    tandembox: "Tandem Box / Slim Box",
+    pushcatcher: "Push Catcher"
+  };
+
+  fetch("assets/data/products.json")
+    .then(r => r.json())
+    .then(data => {
+      const items = Object.entries(data)
+        .filter(([key]) => !key.startsWith("_"))
+        .filter(([, m]) => (m.category || "hinge") === type);
+
+      const label = LABELS[type] || type;
+      titleEl.textContent = label;
+      crumbEl.textContent = label;
+      eyebrowEl.textContent = "Product Category";
+      document.getElementById("page-title").textContent = `${label} — Hongtai Precision Hardware`;
+
+      if (items.length === 0) {
+        grid.outerHTML = `<div class="state-msg">No products listed in this category yet.</div>`;
+        return;
+      }
+
+      grid.innerHTML = items.map(([key, m]) => {
+        const link = `product.html?model=${key}${cidParam ? `&cid=${cidParam}` : ""}`;
+        return `
+          <a class="cat-card" href="${link}">
+            <div class="idx">${key}</div>
+            <h3>${m.name || key}</h3>
+            <p>${m.tagline || ""}</p>
+            <div class="go">View details <span class="arrow">→</span></div>
+          </a>`;
+      }).join("");
+    })
+    .catch(() => {
+      grid.outerHTML = `<div class="state-msg">Could not load the catalog. Try again shortly.</div>`;
+    });
+</script>
+</body>
+</html>
