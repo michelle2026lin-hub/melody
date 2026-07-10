@@ -1,1 +1,39 @@
+{
+  "_说明": "每个型号一个条目，key 是型号编号（出现在网址 ?model=key 里，用不含空格/中文的短代码，比如 H001）。images 是这个型号的图片文件名数组（不是链接，只写文件名，比如 '01.jpg'），实际图片文件要放进 assets/images/型号编号/ 这个文件夹里，文件名要完全对上。video 是视频对象：platform 填 youtube 或 bilibili，id 填对应的视频ID/BV号。category 决定这个型号出现在哪个分类页（category.html?type=xxx），目前用到的值：hinge / slide / stopper。categoryLabel 是分类页显示的英文名。name/tagline/specs 随便改，会自动显示在页面上。",
+
+  "H001": {
+    "name": "165° 全盖软关铰链",
+    "tagline": "35mm 杯径，液压阻尼软关，不用另配缓冲器",
+    "category": "hinge",
+    "categoryLabel": "Hinges",
+    "images": [
+      "01.jpg",
+      "02.jpg",
+      "03.jpg"
+    ],
+    "video": {
+      "platform": "youtube",
+      "id": "替换成YouTube视频ID"
+    },
+    "specs": {
+      "杯径": "35mm",
+      "开合角度": "165°",
+      "安装方式": "卡式三维可调",
+      "材质": "冷轧钢，镀镍"
+    }
+  },
+
+  "H002": {
+    "name": "示例型号二（复制上面这段改就行）",
+    "tagline": "在这里写一句卖点",
+    "category": "hinge",
+    "categoryLabel": "Hinges",
+    "images": [],
+    "video": { "platform": "", "id": "" },
+    "specs": {
+      "杯径": "",
+      "开合角度": ""
+    }
+  }
+}
 
