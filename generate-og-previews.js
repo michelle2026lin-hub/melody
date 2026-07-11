@@ -17,8 +17,8 @@ const fs = require('fs');
 const path = require('path');
 
 const SITE_ROOT = 'https://michelle2026lin-hub.github.io/melody'; // 你的实际网址，改这里
-const DATA_PATH = path.join(__dirname, '..', 'assets', 'data', 'products.json');
-const OUT_DIR = path.join(__dirname, '..', 'p');
+const DATA_PATH = path.join(__dirname, 'assets', 'data', 'products.json');
+const OUT_DIR = path.join(__dirname, 'p');
 
 const data = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
 
