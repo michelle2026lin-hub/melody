@@ -70,9 +70,8 @@
   const app = document.getElementById("app");
   const crumb = document.getElementById("crumb-name");
 
-  // Drive helper for photos — file must be shared "Anyone with the link"
-  // Photos now live in the repo itself: assets/images/{modelKey}/{filename}
-  const localImage = (filename) => `assets/images/${modelKey}/${filename}`;
+  // Photos live at: assets/{category}/{modelKey}/{filename} — e.g. assets/hinge/H001/01.jpg
+  const localImage = (category, filename) => `assets/${category || 'hinge'}/${modelKey}/${filename}`;
 
   // Video embed — supports YouTube (unlisted) or Bilibili (未公开/仅自己)
   // products.json video field: { "platform": "youtube", "id": "VIDEO_ID" }
@@ -104,10 +103,10 @@
       .map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`)
       .join("");
 
-    const mainImg = images[0] ? localImage(images[0]) : "";
+    const mainImg = images[0] ? localImage(model.category, images[0]) : "";
     const thumbs = images.map((filename, i) => `
-      <button class="thumb-btn ${i === 0 ? 'active' : ''}" data-full="${localImage(filename)}">
-        <img src="${localImage(filename)}" alt="${model.name} photo ${i + 1}">
+      <button class="thumb-btn ${i === 0 ? 'active' : ''}" data-full="${localImage(model.category, filename)}">
+        <img src="${localImage(model.category, filename)}" alt="${model.name} photo ${i + 1}">
       </button>
     `).join("");
 
