@@ -1,0 +1,40 @@
+{
+  "_说明": "工厂实力页的数据。categories 数组里每个对象是一个类目板块，id 用于锚点跳转（不含空格），title 是显示的英文标题，videos 数组里每条视频：platform 填 youtube 或 bilibili，id 填视频ID/BV号，caption 是视频下方的一句说明（可留空）。加新视频，直接在对应 category 的 videos 数组里加一条，不用改代码。",
+  "categories": [
+    {
+      "id": "stamping",
+      "title": "配件冲压 / Component Stamping",
+      "videos": [
+        { "platform": "youtube", "id": "替换成YouTube视频ID", "caption": "冲压车间实拍" }
+      ]
+    },
+    {
+      "id": "assembly",
+      "title": "自动组装 / Automated Assembly",
+      "videos": [
+        { "platform": "youtube", "id": "替换成YouTube视频ID", "caption": "自动组装线实拍" }
+      ]
+    },
+    {
+      "id": "packaging",
+      "title": "包装车间 / Packaging",
+      "videos": [
+        { "platform": "youtube", "id": "替换成YouTube视频ID", "caption": "" }
+      ]
+    },
+    {
+      "id": "shipping",
+      "title": "装柜发货 / Container Loading",
+      "videos": [
+        { "platform": "youtube", "id": "替换成YouTube视频ID", "caption": "" }
+      ]
+    },
+    {
+      "id": "visit",
+      "title": "客户来厂参观 / Client Factory Visits",
+      "videos": [
+        { "platform": "youtube", "id": "替换成YouTube视频ID", "caption": "" }
+      ]
+    }
+  ]
+}

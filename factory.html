@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Factory — Hongtai Precision Hardware</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  .fac-nav{display:flex; gap:10px; flex-wrap:wrap; margin:24px 0 48px;}
+  .fac-nav a{
+    font-family:var(--mono); font-size:12.5px; padding:8px 14px;
+    border:1px solid var(--line-strong); border-radius:2px; color:var(--text-1);
+  }
+  .fac-nav a:hover{border-color:var(--brass); color:var(--brass);}
+  .fac-section{padding:48px 0; border-top:1px solid var(--line);}
+  .fac-section:first-of-type{border-top:none;}
+  .fac-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:24px; margin-top:24px;}
+  .fac-video{aspect-ratio:16/9; background:var(--bg-panel); border:1px solid var(--line);}
+  .fac-video iframe{width:100%; height:100%; border:0;}
+  .fac-caption{font-family:var(--mono); font-size:12.5px; color:var(--text-2); margin-top:8px;}
+  @media (max-width:860px){ .fac-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a href="index.html" class="brand">
+      <span class="mark">HT</span>
+      <span>Hongtai<span class="sub" style="display:block;margin-top:2px;">Precision Hardware</span></span>
+    </a>
+    <nav class="nav-links">
+      <a href="category.html?type=hinge">Catalog</a>
+      <a href="factory.html">Factory</a>
+      <a href="catalog-pdf.html">Catalog PDF</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+    <a class="btn ghost" href="index.html#contact">Request a quote</a>
+  </div>
+</header>
+
+<div class="wrap breadcrumb">
+  <a href="index.html">Home</a> / Factory
+</div>
+
+<section class="section" style="padding-bottom:0;">
+  <div class="wrap">
+    <div class="eyebrow">Behind the product</div>
+    <h2 style="font-family:var(--display);font-size:30px;margin:14px 0 0;">Inside the Hongtai factory.</h2>
+    <p style="color:var(--text-1);max-width:56ch;font-size:14.5px;margin-top:10px;">From stamping to shipping — a look at how your order actually gets made.</p>
+    <nav class="fac-nav" id="fac-nav"></nav>
+  </div>
+</section>
+
+<div class="wrap" id="fac-content"></div>
+
+<footer class="site-footer" id="contact">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h4>Company</h4>
+        <p>Guangdong Hongtai Precision Hardware Co., Ltd</p>
+        <p>Pandong Chengxi Community, Jieyang Industrial Transfer Industrial Park</p>
+        <p>Jieyang, Guangdong, China</p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>WhatsApp: +86 18320561551</p>
+        <p>Email: melody_rongxinghardware@hotmail.com</p>
+      </div>
+    </div>
+    <div style="align-self:flex-end;font-family:var(--mono);">© Hongtai Precision Hardware</div>
+  </div>
+</footer>
+
+<script>
+  function embedUrl(video) {
+    if (!video || !video.id || video.id.startsWith('替换')) return null;
+    if (video.platform === 'youtube') return `https://www.youtube-nocookie.com/embed/${video.id}`;
+    if (video.platform === 'bilibili') return `https://player.bilibili.com/player.html?bvid=${video.id}&high_quality=1&danmaku=0`;
+    return null;
+  }
+
+  fetch('assets/data/factory.json')
+    .then(r => r.json())
+    .then(data => {
+      const nav = document.getElementById('fac-nav');
+      const content = document.getElementById('fac-content');
+
+      nav.innerHTML = data.categories.map(c => `<a href="#${c.id}">${c.title}</a>`).join('');
+
+      content.innerHTML = data.categories.map(c => {
+        const videos = (c.videos || []).map(v => {
+          const src = embedUrl(v);
+          const player = src
+            ? `<iframe src="${src}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`
+            : `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-2);font-family:var(--mono);font-size:12px;">Video coming soon</div>`;
+          return `
+            <div>
+              <div class="fac-video">${player}</div>
+              ${v.caption ? `<div class="fac-caption">${v.caption}</div>` : ''}
+            </div>`;
+        }).join('');
+
+        return `
+          <section class="fac-section" id="${c.id}">
+            <div class="eyebrow">${c.title}</div>
+            <div class="fac-grid">${videos || '<p style="color:var(--text-2);font-family:var(--mono);font-size:13px;">No videos yet.</p>'}</div>
+          </section>`;
+      }).join('');
+    })
+    .catch(() => {
+      document.getElementById('fac-content').innerHTML =
+        '<p style="color:var(--text-2);font-family:var(--mono);padding:40px 0;">Could not load factory content.</p>';
+    });
+</script>
+<script src="tracker.js"></script>
+</body>
+</html>
