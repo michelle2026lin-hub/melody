@@ -1,24 +1,26 @@
 #!/usr/bin/env python3
 """
-sync_products_from_feishu.py — 从飞书"产品&装箱库"同步生成 products.json
+sync_products_from_feishu.py — 从飞书同步生成 products.json
 
-✅ 按型号分组的逻辑（重要，跟第一版完全不同）：
-   "产品&装箱库"里，同一个型号会有好几行（不同SIZE/包装方式/液压管的
-   组合），这些行不是各自独立的产品，而是同一个型号页面下的"参数表"。
-   分组依据是"网站代码"这个字段——同一个型号的所有变体行，
-   "网站代码"必须填成完全一样的值（比如都填"H1"），脚本才能正确
-   把它们归到同一个型号页面里。
+✅ 这一版的数据来源改成两张表配合：
+   "产品主表"（tblcCrvPm4yjHcc3）：一个型号一条记录，提供"网站代码"、
+      型号名称、货描、克重这些"型号级别"的信息。"网站代码"只需要在
+      这张表里，每个型号填一次，不需要在"产品&装箱库"的每一行变体
+      记录上重复填。
+   "产品&装箱库"（tblW0mqEonhNoWY0）：一个型号有多行（不同SIZE/包装
+      方式的组合），提供参数表数据。通过"产品"这个字段的名字文字，
+      去匹配"产品主表"里对应的型号，从而找到这一行该归到哪个网站代码。
 
-✅ 图片/视频只跟"型号"绑定，不跟"包装方式"绑定：
-   型号主图/视频放在 assets/{网站代码}/ 这个文件夹下，是型号本身的
-   通用素材（不涉及任何客户定制Logo）。包装方式这一项，网站上只显示
-   文字描述，不关联任何实拍图片/视频——因为包装实拍素材很可能是
-   其他客户订单里带着那个客户品牌Logo拍的，不适合公开展示，
-   这是跟Order+Video模块"客户Logo不得流向公开社媒"同一条红线。
+✅ 图片/视频只跟"型号"绑定：assets/{网站代码}/ 这个文件夹下。
+✅ 包装方式只显示文字，不关联任何图片/视频（避免客户品牌信息外泄）。
 
 用法：把这个脚本放进本地网站项目文件夹（能看到assets/product.html的
 那一层），运行：
     python3 sync_products_from_feishu.py
+
+⚠️ 首次使用需要在同一文件夹下新建一个 feishu_secret.txt 文件，
+   里面只写一行飞书应用密钥（问Melody要，不要写进这个脚本本体里，
+   避免密钥被提交到公开仓库）。
 """
 
 import os
@@ -30,30 +32,11 @@ import requests
 # 配置区
 # ══════════════════════════════════════════
 APP_ID     = "cli_a93642b6fbb99bc3"
-# ✅ 修复真实安全问题：之前APP_SECRET直接写死在这个脚本里，你的仓库是
-# 公开仓库，一旦推送成功，任何人都能看到这个密钥。现在改成从一个单独的
-# 本地文件 feishu_secret.txt 读取，这个文件需要加进 .gitignore，
-# 永远不会被提交到GitHub上
-def _load_app_secret():
-    secret_file = "feishu_secret.txt"
-    if not os.path.exists(secret_file):
-        print(f"❌ 找不到 {secret_file} 这个文件")
-        print(f"   请在这个脚本同一个文件夹下，新建一个叫 {secret_file} 的文本文件，")
-        print(f"   里面只写一行：Y0zdHVkdanDgshztW5nsCd4xndA3yKci")
-        print(f"   （这一步只需要做一次）")
-        exit(1)
-    with open(secret_file, encoding="utf-8") as f:
-        return f.read().strip()
-
-APP_SECRET = _load_app_secret()
 BASE_ID    = "BrWfbe480a83Z2scZJJcgSLqnLc"
-PRODUCT_TABLE_ID = "tblW0mqEonhNoWY0"  # 产品&装箱库
+MASTER_TABLE_ID  = "tblcCrvPm4yjHcc3"  # 产品主表：一型号一条，提供网站代码
+PRODUCT_TABLE_ID = "tblW0mqEonhNoWY0"  # 产品&装箱库：一型号多行，提供SIZE/包装方式
 
-DEFAULT_CATEGORY = ("hinge", "Hinges")  # 兜底默认值，网站代码首字母不在下面
-                                          # 这张映射表里时使用
-# ✅ 新增：按"网站代码"首字母自动判断分类，不需要在飞书里额外加"分类"字段。
-# 以后加滑轨/门吸产品时，只要网站代码按这个约定命名（比如滑轨用S1/S2...），
-# 就能自动分类到正确的产品目录页
+DEFAULT_CATEGORY = ("hinge", "Hinges")
 CATEGORY_BY_PREFIX = {
     "H": ("hinge", "Hinges"),
     "S": ("slide", "Slides"),
@@ -61,7 +44,20 @@ CATEGORY_BY_PREFIX = {
 }
 
 JSON_PATH = "assets/data/products.json"
-ASSETS_ROOT = "assets"  # ✅ 图片文件夹直接是 assets/{网站代码}/，不再按分类分层
+ASSETS_ROOT = "assets"
+
+
+def _load_app_secret():
+    secret_file = "feishu_secret.txt"
+    if not os.path.exists(secret_file):
+        print(f"❌ 找不到 {secret_file} 这个文件")
+        print(f"   请在这个脚本同一个文件夹下，新建一个叫 {secret_file} 的文本文件，")
+        print(f"   里面只写一行飞书应用密钥")
+        exit(1)
+    with open(secret_file, encoding="utf-8") as f:
+        return f.read().strip()
+
+APP_SECRET = _load_app_secret()
 
 
 def get_token():
@@ -73,7 +69,7 @@ def get_token():
 
 
 def fv(fields, key, default=""):
-    """兼容字段名带空格/括号后缀的情况，同generate_pi_pl.py"""
+    """兼容字段名带空格/括号后缀的情况"""
     v = fields.get(key, None)
     if v is None:
         def _normalize(s):
@@ -93,21 +89,17 @@ def fv(fields, key, default=""):
         if not v:
             return default
         item = v[0]
-        result = item.get("text", item.get("value", str(item))) if isinstance(item, dict) else str(item)
-    elif isinstance(v, dict):
-        result = v.get("value", v.get("text", str(v)))
-    else:
-        result = v
-    return result
+        return item.get("text", item.get("value", str(item))) if isinstance(item, dict) else str(item)
+    if isinstance(v, dict):
+        return v.get("value", v.get("text", str(v)))
+    return v
 
 
 def s(v) -> str:
-    """✅ 修复上一版的真实bug：飞书返回的数字字段有时是float/int类型，
-    不是文字，之前直接对它调用.strip()会崩溃。统一先转字符串再处理。"""
     return str(v).strip() if v is not None else ""
 
 
-def fetch_all_products(token):
+def fetch_all_records(token, table_id):
     headers = {"Authorization": f"Bearer {token}"}
     all_items, page_token = [], None
     while True:
@@ -115,7 +107,7 @@ def fetch_all_products(token):
         if page_token:
             params["page_token"] = page_token
         res = requests.get(
-            f"https://open.feishu.cn/open-apis/bitable/v1/apps/{BASE_ID}/tables/{PRODUCT_TABLE_ID}/records",
+            f"https://open.feishu.cn/open-apis/bitable/v1/apps/{BASE_ID}/tables/{table_id}/records",
             headers=headers, params=params, timeout=15,
         )
         data = res.json().get("data", {})
@@ -127,8 +119,6 @@ def fetch_all_products(token):
 
 
 def scan_local_images(model_code: str) -> list:
-    """扫描本地 assets/{网站代码}/ 这个文件夹（不再分category子层），
-    看有哪些图片文件，自动填进images数组"""
     folder = os.path.join(ASSETS_ROOT, model_code)
     if not os.path.isdir(folder):
         return []
@@ -136,65 +126,58 @@ def scan_local_images(model_code: str) -> list:
     return [f for f in sorted(os.listdir(folder)) if f.lower().endswith(valid_ext)]
 
 
-def build_product_entry(model_code: str, rows: list, existing_entry: dict = None) -> dict:
-    """
-    ✅ 核心改动：接收"同一个网站代码下的所有变体行"(rows)，而不是单独一行。
-    型号名/图片/视频只取第一行的信息（因为同一组理应是同一个型号）；
-    参数表(variants)是一个数组，每个变体行各自一条，只保留产品/SIZE/包装方式
-    这三项（按你确认的范围，不包含液压管/单价这些，且包装方式只是文字，
-    不关联任何图片视频）。
-    """
-    first = rows[0]
-    category, category_label = CATEGORY_BY_PREFIX.get(model_code[:1].upper(), DEFAULT_CATEGORY)
-
-    name = fv(first, "产品", model_code)
-    huomiao = s(fv(first, "货描", ""))
-    tagline = huomiao[:80] + ("..." if len(huomiao) > 80 else "")
-
-    images = scan_local_images(model_code)
-    video = (existing_entry or {}).get("video", {"platform": "", "id": ""})
-
-    # ✅ 参数表：每个变体行一条，只保留产品/SIZE/包装方式这三项文字信息
-    variants = []
-    for row in rows:
-        variants.append({
-            "产品": s(fv(row, "产品", name)),
-            "SIZE": s(fv(row, "SIZE", "")),
-            "包装方式": s(fv(row, "包装方式", "")),  # 纯文字，不关联图片/视频
-        })
-
-    return {
-        "name": name,
-        "tagline": tagline,
-        "category": category,
-        "categoryLabel": category_label,
-        "images": images,
-        "video": video,
-        "variants": variants,  # ✅ 新字段：这个型号下所有SIZE/包装方式的组合列表
-    }
-
-
 def main():
     print("正在获取飞书Token...")
     token = get_token()
 
-    print("正在拉取「产品&装箱库」全部记录...")
-    all_fields = fetch_all_products(token)
-    print(f"共拉取到 {len(all_fields)} 条记录")
+    print("正在拉取「产品主表」...")
+    master_rows = fetch_all_records(token, MASTER_TABLE_ID)
+    print(f"共 {len(master_rows)} 个型号")
 
-    # ✅ 按"网站代码"分组：同一个网站代码下的多行，归成一组
-    groups = {}
-    no_code_count = 0
-    for fields in all_fields:
-        code = s(fv(fields, "网站代码", ""))
-        if not code:
-            no_code_count += 1
+    # ✅ 建立 "产品名文字" → 网站代码/型号信息 的对照表
+    master_by_name = {}
+    no_code_in_master = 0
+    for row in master_rows:
+        pname = s(fv(row, "产品", ""))
+        code = s(fv(row, "网站代码", ""))
+        if not pname:
             continue
-        groups.setdefault(code, []).append(fields)
+        if not code:
+            no_code_in_master += 1
+            continue
+        master_by_name[pname] = {
+            "code": code,
+            "name": s(fv(row, "产品", code)),
+            "huomiao": s(fv(row, "货描", "")),
+        }
+    print(f"「产品主表」里已填「网站代码」的型号：{len(master_by_name)} 个")
+    if no_code_in_master:
+        print(f"⚠️ 有 {no_code_in_master} 个型号还没填「网站代码」，暂时不会出现在网站上")
 
-    print(f"按网站代码分组后，共 {len(groups)} 个型号")
-    if no_code_count:
-        print(f"⚠️ 有 {no_code_count} 条记录没有填「网站代码」，已跳过")
+    print("正在拉取「产品&装箱库」全部变体记录...")
+    variant_rows = fetch_all_records(token, PRODUCT_TABLE_ID)
+    print(f"共 {len(variant_rows)} 条变体记录")
+
+    # ✅ 按"产品"名字匹配到产品主表，归到对应网站代码
+    groups = {}  # code -> {"master": {...}, "variants": [...]}
+    unmatched = 0
+    for row in variant_rows:
+        pname = s(fv(row, "产品", ""))
+        master = master_by_name.get(pname)
+        if not master:
+            unmatched += 1
+            continue
+        code = master["code"]
+        if code not in groups:
+            groups[code] = {"master": master, "variants": []}
+        groups[code]["variants"].append({
+            "产品": pname,
+            "SIZE": s(fv(row, "SIZE", "")),
+            "包装方式": s(fv(row, "包装方式", "")),
+        })
+    print(f"成功匹配、归组的变体记录：{len(variant_rows) - unmatched} 条")
+    if unmatched:
+        print(f"⚠️ 有 {unmatched} 条变体记录，「产品」名字在产品主表里没找到匹配（或者产品主表那边还没填网站代码），已跳过")
 
     existing_data = {}
     if os.path.exists(JSON_PATH):
@@ -206,12 +189,26 @@ def main():
 
     new_data = dict(existing_data)
     if "_说明" not in new_data:
-        new_data["_说明"] = "由sync_products_from_feishu.py自动同步生成，按「网站代码」把产品&装箱库里的多行变体汇总成一个型号页面，图片放在 assets/{网站代码}/ 下"
+        new_data["_说明"] = "由sync_products_from_feishu.py自动同步生成：网站代码来自「产品主表」，SIZE/包装方式来自「产品&装箱库」按产品名匹配归组。图片放在 assets/{网站代码}/ 下"
 
     updated_count = 0
-    for model_code, rows in groups.items():
-        entry = build_product_entry(model_code, rows, existing_data.get(model_code))
-        new_data[model_code] = entry
+    for code, g in groups.items():
+        master = g["master"]
+        category, category_label = CATEGORY_BY_PREFIX.get(code[:1].upper(), DEFAULT_CATEGORY)
+        huomiao = master["huomiao"]
+        tagline = huomiao[:80] + ("..." if len(huomiao) > 80 else "")
+        existing_entry = existing_data.get(code, {})
+        video = existing_entry.get("video", {"platform": "", "id": ""})
+
+        new_data[code] = {
+            "name": master["name"],
+            "tagline": tagline,
+            "category": category,
+            "categoryLabel": category_label,
+            "images": scan_local_images(code),
+            "video": video,
+            "variants": g["variants"],
+        }
         updated_count += 1
 
     with open(JSON_PATH, "w", encoding="utf-8") as f:
@@ -219,7 +216,7 @@ def main():
 
     print(f"✅ 已更新/新增 {updated_count} 个型号")
     print(f"✅ products.json 已保存到: {os.path.abspath(JSON_PATH)}")
-    print("接下来用GitHub Desktop（或git命令行）提交、推送上线即可")
+    print("接下来用git提交、推送上线即可")
 
 
 if __name__ == "__main__":
