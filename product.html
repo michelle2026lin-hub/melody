@@ -70,8 +70,8 @@
   const app = document.getElementById("app");
   const crumb = document.getElementById("crumb-name");
 
-  // Photos live at: assets/{category}/{modelKey}/{filename} — e.g. assets/hinge/H001/01.jpg
-  const localImage = (category, filename) => `assets/${category || 'hinge'}/${modelKey}/${filename}`;
+  // Photos live at: assets/{modelKey}/{filename} — e.g. assets/H001/01.jpg
+  const localImage = (category, filename) => `assets/${modelKey}/${filename}`;
 
   // Video embed — supports YouTube (unlisted) or Bilibili (未公开/仅自己)
   // products.json video field: { "platform": "youtube", "id": "VIDEO_ID" }
