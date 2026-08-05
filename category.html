@@ -9,6 +9,10 @@
 <link rel="stylesheet" href="assets/css/style.css">
 <style>
   .state-msg{font-family:var(--mono); font-size:13px; color:var(--text-2); padding:60px 0; text-align:center;}
+  /* ✅ 新增：分类页卡片缩略图的基础样式 */
+  .cat-card-thumb{width:100%; aspect-ratio:4/3; overflow:hidden; background:var(--bg-panel, #f2f2f2); margin-bottom:12px;}
+  .cat-card-thumb img{width:100%; height:100%; object-fit:cover; display:block;}
+  .cat-card-thumb-empty{display:flex; align-items:center; justify-content:center;}
 </style>
 </head>
 <body>
@@ -102,8 +106,14 @@
 
       grid.innerHTML = items.map(([key, m]) => {
         const link = `product.html?model=${key}${cidParam ? `&cid=${cidParam}` : ""}`;
+        // ✅ 新增：缩略图，取这个型号images数组里的第一张，
+        // 路径规则跟product.html一致：assets/{key}/{filename}
+        const thumb = (m.images && m.images[0]) ? `assets/${key}/${m.images[0]}` : "";
         return `
           <a class="cat-card" href="${link}">
+            ${thumb
+              ? `<div class="cat-card-thumb"><img src="${thumb}" alt="${m.name || key}" loading="lazy"></div>`
+              : `<div class="cat-card-thumb cat-card-thumb-empty"></div>`}
             <div class="idx">${key}</div>
             <h3>${m.name || key}</h3>
             <p>${m.tagline || ""}</p>
