@@ -1,26 +1,20 @@
 #!/usr/bin/env python3
 """
-sync_products_from_feishu.py — 从飞书同步生成 products.json
+sync_products_from_feishu.py — 从飞书"产品主表"同步生成 products.json
 
-✅ 这一版的数据来源改成两张表配合：
-   "产品主表"（tblcCrvPm4yjHcc3）：一个型号一条记录，提供"网站代码"、
-      型号名称、货描、克重这些"型号级别"的信息。"网站代码"只需要在
-      这张表里，每个型号填一次，不需要在"产品&装箱库"的每一行变体
-      记录上重复填。
-   "产品&装箱库"（tblW0mqEonhNoWY0）：一个型号有多行（不同SIZE/包装
-      方式的组合），提供参数表数据。通过"产品"这个字段的名字文字，
-      去匹配"产品主表"里对应的型号，从而找到这一行该归到哪个网站代码。
+✅ 这一版只读一张表："产品主表"（tblcCrvPm4yjHcc3）。
+   一个型号一条记录，字段包括：产品、货描、克重、网站代码、克重单位、
+   单价单位、订单数量单位。不再需要"产品&装箱库"参与。
 
 ✅ 图片/视频只跟"型号"绑定：assets/{网站代码}/ 这个文件夹下。
-✅ 包装方式只显示文字，不关联任何图片/视频（避免客户品牌信息外泄）。
 
 用法：把这个脚本放进本地网站项目文件夹（能看到assets/product.html的
 那一层），运行：
     python3 sync_products_from_feishu.py
 
 ⚠️ 首次使用需要在同一文件夹下新建一个 feishu_secret.txt 文件，
-   里面只写一行飞书应用密钥（问Melody要，不要写进这个脚本本体里，
-   避免密钥被提交到公开仓库）。
+   里面只写一行飞书应用密钥，不要写进这个脚本本体（避免密钥被提交到
+   公开仓库被拦截）。
 """
 
 import os
@@ -33,8 +27,7 @@ import requests
 # ══════════════════════════════════════════
 APP_ID     = "cli_a93642b6fbb99bc3"
 BASE_ID    = "BrWfbe480a83Z2scZJJcgSLqnLc"
-MASTER_TABLE_ID  = "tblcCrvPm4yjHcc3"  # 产品主表：一型号一条，提供网站代码
-PRODUCT_TABLE_ID = "tblW0mqEonhNoWY0"  # 产品&装箱库：一型号多行，提供SIZE/包装方式
+MASTER_TABLE_ID = "tblcCrvPm4yjHcc3"  # 产品主表：唯一数据来源
 
 DEFAULT_CATEGORY = ("hinge", "Hinges")
 CATEGORY_BY_PREFIX = {
@@ -131,53 +124,8 @@ def main():
     token = get_token()
 
     print("正在拉取「产品主表」...")
-    master_rows = fetch_all_records(token, MASTER_TABLE_ID)
-    print(f"共 {len(master_rows)} 个型号")
-
-    # ✅ 建立 "产品名文字" → 网站代码/型号信息 的对照表
-    master_by_name = {}
-    no_code_in_master = 0
-    for row in master_rows:
-        pname = s(fv(row, "产品", ""))
-        code = s(fv(row, "网站代码", ""))
-        if not pname:
-            continue
-        if not code:
-            no_code_in_master += 1
-            continue
-        master_by_name[pname] = {
-            "code": code,
-            "name": s(fv(row, "产品", code)),
-            "huomiao": s(fv(row, "货描", "")),
-        }
-    print(f"「产品主表」里已填「网站代码」的型号：{len(master_by_name)} 个")
-    if no_code_in_master:
-        print(f"⚠️ 有 {no_code_in_master} 个型号还没填「网站代码」，暂时不会出现在网站上")
-
-    print("正在拉取「产品&装箱库」全部变体记录...")
-    variant_rows = fetch_all_records(token, PRODUCT_TABLE_ID)
-    print(f"共 {len(variant_rows)} 条变体记录")
-
-    # ✅ 按"产品"名字匹配到产品主表，归到对应网站代码
-    groups = {}  # code -> {"master": {...}, "variants": [...]}
-    unmatched = 0
-    for row in variant_rows:
-        pname = s(fv(row, "产品", ""))
-        master = master_by_name.get(pname)
-        if not master:
-            unmatched += 1
-            continue
-        code = master["code"]
-        if code not in groups:
-            groups[code] = {"master": master, "variants": []}
-        groups[code]["variants"].append({
-            "产品": pname,
-            "SIZE": s(fv(row, "SIZE", "")),
-            "包装方式": s(fv(row, "包装方式", "")),
-        })
-    print(f"成功匹配、归组的变体记录：{len(variant_rows) - unmatched} 条")
-    if unmatched:
-        print(f"⚠️ 有 {unmatched} 条变体记录，「产品」名字在产品主表里没找到匹配（或者产品主表那边还没填网站代码），已跳过")
+    rows = fetch_all_records(token, MASTER_TABLE_ID)
+    print(f"共 {len(rows)} 个型号")
 
     existing_data = {}
     if os.path.exists(JSON_PATH):
@@ -189,25 +137,39 @@ def main():
 
     new_data = dict(existing_data)
     if "_说明" not in new_data:
-        new_data["_说明"] = "由sync_products_from_feishu.py自动同步生成：网站代码来自「产品主表」，SIZE/包装方式来自「产品&装箱库」按产品名匹配归组。图片放在 assets/{网站代码}/ 下"
+        new_data["_说明"] = "由sync_products_from_feishu.py自动同步生成，唯一数据来源是飞书「产品主表」。图片放在 assets/{网站代码}/ 下"
 
     updated_count = 0
-    for code, g in groups.items():
-        master = g["master"]
+    no_code_count = 0
+    for row in rows:
+        code = s(fv(row, "网站代码", ""))
+        if not code:
+            no_code_count += 1
+            continue
+
         category, category_label = CATEGORY_BY_PREFIX.get(code[:1].upper(), DEFAULT_CATEGORY)
-        huomiao = master["huomiao"]
+        name = s(fv(row, "产品", code))
+        huomiao = s(fv(row, "货描", ""))
         tagline = huomiao[:80] + ("..." if len(huomiao) > 80 else "")
+
         existing_entry = existing_data.get(code, {})
         video = existing_entry.get("video", {"platform": "", "id": ""})
 
+        specs = {
+            "克重": f"{s(fv(row, '克重', ''))}{s(fv(row, '克重单位', ''))}".strip(),
+            "单价单位": s(fv(row, "单价单位", "")),
+            "订单数量单位": s(fv(row, "订单数量单位", "")),
+        }
+        specs = {k: v for k, v in specs.items() if v}
+
         new_data[code] = {
-            "name": master["name"],
+            "name": name,
             "tagline": tagline,
             "category": category,
             "categoryLabel": category_label,
             "images": scan_local_images(code),
             "video": video,
-            "variants": g["variants"],
+            "specs": specs,
         }
         updated_count += 1
 
@@ -215,6 +177,8 @@ def main():
         json.dump(new_data, f, ensure_ascii=False, indent=2)
 
     print(f"✅ 已更新/新增 {updated_count} 个型号")
+    if no_code_count:
+        print(f"⚠️ 有 {no_code_count} 个型号还没填「网站代码」，已跳过")
     print(f"✅ products.json 已保存到: {os.path.abspath(JSON_PATH)}")
     print("接下来用git提交、推送上线即可")
 
