@@ -5,15 +5,15 @@
    ============================================================ */
 
 :root{
-  --bg-0: #111418;         /* deepest background */
-  --bg-1: #171b21;         /* page background */
-  --bg-panel: #1e232a;     /* card / panel */
-  --bg-panel-raised: #262c34;
-  --line: #2e353d;         /* hairline rules */
-  --line-strong: #3d454e;
-  --text-0: #f1f3f5;       /* primary text */
-  --text-1: #aeb6bf;       /* secondary text */
-  --text-2: #767f89;       /* muted / captions */
+  --bg-0: #1a1e24;         /* deepest background */
+  --bg-1: #20252c;         /* page background */
+  --bg-panel: #2a3038;     /* card / panel */
+  --bg-panel-raised: #333a44;
+  --line: #3a414b;         /* hairline rules */
+  --line-strong: #4a525d;
+  --text-0: #f5f6f7;       /* primary text */
+  --text-1: #b8c0c9;       /* secondary text */
+  --text-2: #838d97;       /* muted / captions */
 
   /* accent — was brass/gold, now red to match the HOTTAI logo.
      kept the --brass variable name so it stays a single source of truth
@@ -72,10 +72,11 @@ img{max-width:100%;display:block;}
   font-family:var(--display); font-weight:700; font-size:18px; letter-spacing:0.01em;
 }
 .brand .mark{
-  width:30px;height:30px; border:1.5px solid var(--brass); border-radius:3px;
+  /* white chip behind the logo so it reads clearly on the dark header */
+  height:34px; padding:6px 10px; background:#fff; border-radius:4px;
   display:flex; align-items:center; justify-content:center;
-  color:var(--brass); font-family:var(--mono); font-size:12px;
 }
+.brand .mark img{height:100%; width:auto; display:block;}
 .brand .sub{color:var(--text-2); font-family:var(--mono); font-size:11px; font-weight:400; letter-spacing:0.08em; text-transform:uppercase;}
 
 .nav-links{display:flex; gap:26px; font-size:14px; color:var(--text-1);}
@@ -106,14 +107,31 @@ img{max-width:100%;display:block;}
   border-top:1px solid var(--line); margin-top:120px;
   padding:48px 0; color:var(--text-2); font-size:13px;
 }
-.site-footer .wrap{display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;}
+.site-footer .wrap{display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; align-items:flex-end;}
 .site-footer .cols{display:flex; gap:56px; flex-wrap:wrap;}
 .site-footer h4{font-family:var(--mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-1); margin:0 0 12px;}
 .site-footer p{margin:4px 0;}
-.site-footer .qr-row{display:flex; gap:16px; margin-top:12px;}
-.site-footer .qr-row figure{margin:0; text-align:center;}
-.site-footer .qr-row img{width:74px; height:74px; background:#fff; padding:4px; border:1px solid var(--line-strong);}
-.site-footer .qr-row figcaption{font-family:var(--mono); font-size:10.5px; color:var(--text-2); margin-top:4px;}
+
+/* right side of the footer: QR codes stacked above the copyright line */
+.footer-right{display:flex; flex-direction:column; align-items:flex-end; gap:18px;}
+.footer-right .qr-row{display:flex; gap:16px;}
+.footer-right .qr-row figure{margin:0; text-align:center;}
+.footer-right .qr-row img{width:92px; height:92px; background:#fff; padding:5px; border:1px solid var(--line-strong);}
+.footer-right .qr-row figcaption{font-family:var(--mono); font-size:11px; color:var(--text-2); margin-top:6px;}
+.footer-copyright{font-family:var(--mono);}
+
+/* small round icon buttons for WhatsApp / WeChat direct links */
+.icon-btn-row{display:flex; gap:12px;}
+.icon-btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:11px 18px; border-radius:2px;
+  border:1px solid var(--line-strong); color:var(--text-0);
+  font-family:var(--body); font-size:14px; font-weight:600;
+  transition:all .15s;
+}
+.icon-btn svg{width:18px; height:18px; flex-shrink:0;}
+.icon-btn.whatsapp:hover{border-color:#25D366; color:#25D366;}
+.icon-btn.wechat:hover{border-color:#07C160; color:#07C160;}
 
 /* ---------- hero ---------- */
 .hero{padding:72px 0 56px;}
@@ -146,6 +164,7 @@ img{max-width:100%;display:block;}
 .section-head p{color:var(--text-1); max-width:52ch; margin:8px 0 0; font-size:14.5px;}
 
 .catalog-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
+.product-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line);}
 .cat-card{
   background:var(--bg-panel); padding:30px 26px; position:relative;
   transition:background .18s;
@@ -186,11 +205,11 @@ img{max-width:100%;display:block;}
 .media-row{display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start;}
 
 .gallery-main{
-  aspect-ratio:4/3; background:var(--img-bg); border:1px solid var(--line);
+  background:var(--img-bg); border:1px solid var(--line);
   display:flex; align-items:center; justify-content:center; color:var(--text-2);
   font-family:var(--mono); font-size:13px; overflow:hidden;
 }
-.gallery-main img{width:100%; height:100%; object-fit:contain;}
+.gallery-main img{width:100%; height:auto; max-height:560px; object-fit:contain; display:block;}
 .gallery-thumbs{display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-top:8px;}
 .gallery-thumbs .thumb-btn{
   aspect-ratio:1; background:var(--img-bg); border:1px solid var(--line);
@@ -216,6 +235,7 @@ img{max-width:100%;display:block;}
 @media (max-width:860px){
   .hero-grid{grid-template-columns:1fr;}
   .catalog-grid{grid-template-columns:1fr;}
+  .product-grid{grid-template-columns:repeat(2,1fr);}
   .media-row{grid-template-columns:1fr;}
   .gallery-thumbs{grid-template-columns:repeat(4,1fr);}
   .nav-links{display:none;}

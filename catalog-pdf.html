@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Full Catalog (PDF) — Hongtai Precision Hardware</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  .pdf-frame{
+    width:100%; height:82vh; min-height:520px;
+    border:1px solid var(--line); background:var(--bg-panel); margin-top:24px;
+  }
+  .pdf-actions{display:flex; gap:12px; margin-top:18px; flex-wrap:wrap; align-items:center;}
+  .pdf-note{font-family:var(--mono); font-size:12px; color:var(--text-2);}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a href="index.html" class="brand">
+      <span class="mark">HT</span>
+      <span>Hongtai<span class="sub" style="display:block;margin-top:2px;">Precision Hardware</span></span>
+    </a>
+    <nav class="nav-links">
+      <a href="category.html?type=hinge">Catalog</a>
+      <a href="factory.html">Factory</a>
+      <a href="catalog-pdf.html">Catalog PDF</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+    <a class="btn ghost" href="index.html#contact">Request a quote</a>
+  </div>
+</header>
+
+<div class="wrap breadcrumb">
+  <a href="index.html">Home</a> / Full Catalog (PDF)
+</div>
+
+<section class="section" style="padding-top:20px;">
+  <div class="wrap">
+    <div class="eyebrow">Full Product Range</div>
+    <h2 style="font-family:var(--display);font-size:28px;margin:14px 0 6px;">2026 Catalog</h2>
+    <p style="color:var(--text-1);font-size:14px;">Browse the full catalog below, or download a copy.</p>
+
+    <iframe class="pdf-frame" src="assets/catalog/hongtai-catalogue.pdf" title="Hongtai Catalog"></iframe>
+
+    <div class="pdf-actions">
+      <a class="btn" href="assets/catalog/hongtai-catalogue.pdf" download>Download PDF</a>
+      <span class="pdf-note">Mobile WhatsApp browsers sometimes can't preview PDFs inline — the download button always works as a fallback.</span>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" id="contact">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h4>Company</h4>
+        <p>Guangdong Hongtai Precision Hardware Co., Ltd</p>
+        <p>Pandong Chengxi Community, Jieyang Industrial Transfer Industrial Park</p>
+        <p>Jieyang, Guangdong, China</p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>WhatsApp: +86 18320561551</p>
+        <p>Email: melody_rongxinghardware@hotmail.com</p>
+      </div>
+    </div>
+    <div style="align-self:flex-end;font-family:var(--mono);">© Hongtai Precision Hardware</div>
+  </div>
+</footer>
+
+<script src="tracker.js"></script>
+</body>
+</html>

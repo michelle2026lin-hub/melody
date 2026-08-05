@@ -19,7 +19,7 @@
 <header class="site-header">
   <div class="wrap">
     <a href="index.html" class="brand">
-      <span class="mark">HT</span>
+      <span class="mark"><img src="assets/brand/hottai-logo.png" alt="HOTTAI"></span>
       <span>Hongtai<span class="sub" style="display:block;margin-top:2px;">Precision Hardware</span></span>
     </a>
     <nav class="nav-links">
@@ -33,11 +33,7 @@
   </div>
 </header>
 
-<div class="wrap breadcrumb">
-  <a href="index.html">Catalog</a> / <span id="crumb-name">Loading…</span>
-</div>
-
-<div id="app" class="wrap">
+<div id="app" class="wrap" style="padding-top:28px;">
   <div class="state-msg">Loading product…</div>
 </div>
 
@@ -55,13 +51,15 @@
         <p>Melody — Sales Manager</p>
         <p>WhatsApp: +86 18320561551</p>
         <p>Email: melody_rongxinghardware@hotmail.com</p>
-        <div class="qr-row">
-          <figure><img src="assets/contact/whatsapp-qr.png" alt="WhatsApp QR" loading="lazy" onerror="this.closest('figure').style.display='none'"><figcaption>WhatsApp</figcaption></figure>
-          <figure><img src="assets/contact/wechat-qr.png" alt="WeChat QR" loading="lazy" onerror="this.closest('figure').style.display='none'"><figcaption>WeChat</figcaption></figure>
-        </div>
       </div>
     </div>
-    <div style="align-self:flex-end;font-family:var(--mono);">© Hongtai Precision Hardware</div>
+    <div class="footer-right">
+      <div class="qr-row">
+        <figure><img src="assets/contact/whatsapp-qr.png" alt="WhatsApp QR" loading="lazy" onerror="this.closest('figure').style.display='none'"><figcaption>WhatsApp</figcaption></figure>
+        <figure><img src="assets/contact/wechat-qr.png" alt="WeChat QR" loading="lazy" onerror="this.closest('figure').style.display='none'"><figcaption>WeChat</figcaption></figure>
+      </div>
+      <div class="footer-copyright">© Hongtai Precision Hardware</div>
+    </div>
   </div>
 </footer>
 
@@ -70,13 +68,15 @@
   const params = new URLSearchParams(window.location.search);
   const modelKey = params.get("model");
   const app = document.getElementById("app");
-  const crumb = document.getElementById("crumb-name");
 
   const WHATSAPP_NUMBER = "8618320561551";
   function waLink(text) {
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
   }
   document.getElementById("quote-btn-top").href = waLink("Hi Hongtai, I'd like a quote.");
+
+  const WA_ICON = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2z" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 8.7c.2-.6.5-.6.8-.6h.5c.2 0 .4 0 .6.4.2.5.7 1.6.7 1.7.1.1.1.3 0 .4-.1.2-.2.3-.3.4-.1.1-.3.3-.4.4-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.7-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1.2.1 1.5.7 1.8.8.3.1.4.2.5.3.1.2.1.9-.2 1.7-.3.8-1.7 1.5-2.4 1.6-.6.1-1.3.2-4.2-1s-4.6-4-4.8-4.7c-.2-.6-.7-1.6-.7-2.5 0-1 .5-1.5.7-1.7z" fill="currentColor"/></svg>`;
+  const WECHAT_ICON = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 3.5c-3.6 0-6.4 2.5-6.4 5.6 0 1.7 1 3.3 2.5 4.4l-.6 2 2.2-1.1c.7.2 1.5.3 2.3.3h.3a5.9 5.9 0 0 1-.2-1.6c0-3.2 3-5.8 6.7-5.8h.3C15.7 4.9 12.6 3.5 9 3.5z" fill="currentColor"/><path d="M16.5 10.4c-3 0-5.5 2.1-5.5 4.7s2.5 4.7 5.5 4.7c.6 0 1.2-.1 1.8-.3l1.8.9-.5-1.7c1.2-.9 2-2.1 2-3.6 0-2.6-2.5-4.7-5.6-4.7z" fill="currentColor" opacity="0.55"/><circle cx="7" cy="8.3" r="0.9" fill="#fff"/><circle cx="11" cy="8.3" r="0.9" fill="#fff"/><circle cx="15" cy="13.5" r="0.8" fill="#fff"/><circle cx="18" cy="13.5" r="0.8" fill="#fff"/></svg>`;
 
   // Photos live at: assets/{modelKey}/{filename} — e.g. assets/H001/01.jpg
   const localImage = (filename) => `assets/${modelKey}/${filename}`;
@@ -101,7 +101,6 @@
 
   function renderProduct(model) {
     document.getElementById("page-title").textContent = `${model.name} — Hongtai Precision Hardware`;
-    crumb.textContent = model.name;
 
     const images = (model.images || []).filter(id => id && !id.startsWith("替换"));
     const embedUrl = videoEmbedUrl(model.video);
@@ -114,7 +113,6 @@
     `).join("");
 
     const quoteText = `Hi Hongtai, I'd like a quote for ${modelKey} — ${model.name}`;
-    const oemText = `Hi Hongtai, I'd like to ask about OEM branding for ${modelKey} — ${model.name}`;
 
     app.innerHTML = `
       <div class="product-name-label">${model.name}</div>
@@ -138,14 +136,15 @@
         </div>
       </div>
 
-      <div class="info-actions">
-        <a class="btn" href="${waLink(quoteText)}" target="_blank" rel="noopener">Request quote for this item</a>
-        <a class="btn ghost" href="${waLink(oemText)}" target="_blank" rel="noopener">Ask about OEM branding</a>
-      </div>
-
-      <div class="tracking-note">
-        This page is a private link shared with one buyer at a time. It has no visible tracking UI —
-        opens and read time are logged for our own follow-up only.
+      <div class="icon-btn-row" style="margin-top:24px;">
+        <a class="icon-btn whatsapp" href="${waLink(quoteText)}" target="_blank" rel="noopener">
+          ${WA_ICON}
+          WhatsApp
+        </a>
+        <a class="icon-btn wechat" href="#contact">
+          ${WECHAT_ICON}
+          WeChat (scan QR below)
+        </a>
       </div>
     `;
 
