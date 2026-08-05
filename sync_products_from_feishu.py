@@ -30,10 +30,19 @@ BASE_ID    = "BrWfbe480a83Z2scZJJcgSLqnLc"
 MASTER_TABLE_ID = "tblcCrvPm4yjHcc3"  # 产品主表：唯一数据来源
 
 DEFAULT_CATEGORY = ("hinge", "Hinges")
+# 网站代码第一个字母 -> 分类。新加了合页(Y)和小五金(M)两个分类；
+# 如果你的飞书表里"隐藏轨/滑轨"用的不是下面这套首字母，去飞书表里把
+# 网站代码前缀改成对应字母就行，不用改这个脚本。
 CATEGORY_BY_PREFIX = {
     "H": ("hinge", "Hinges"),
-    "S": ("slide", "Slides"),
+    "S": ("slide", "Drawer Slides"),
+    "U": ("undermount", "Undermount Slides"),
+    "T": ("tandembox", "Tandem Box / Slim Box"),
+    "G": ("gasspring", "Gas Spring / Lift"),
     "D": ("stopper", "Door Stopper"),
+    "Y": ("doorhinge", "Door Hinge"),
+    "P": ("pushcatcher", "Push Catcher"),
+    "M": ("misc", "Misc Hardware"),
 }
 
 JSON_PATH = "assets/data/products.json"
@@ -135,16 +144,26 @@ def main():
         except Exception as e:
             print(f"⚠️ 读取现有products.json失败，将视为空文件重新生成: {e}")
 
-    new_data = dict(existing_data)
-    if "_说明" not in new_data:
-        new_data["_说明"] = "由sync_products_from_feishu.py自动同步生成，唯一数据来源是飞书「产品主表」。图片放在 assets/{网站代码}/ 下"
+    # 每次都是干净重建（只保留视频字段这种"手工加过、飞书里没有"的信息），
+    # 这样测试用的示例数据（比如"示例模型二"）、以前手滑生成的脏数据，
+    # 不会一直赖在products.json里不走。
+    new_data = {
+        "_说明": "由sync_products_from_feishu.py自动同步生成，唯一数据来源是飞书「产品主表」。图片放在 assets/{网站代码}/ 下"
+    }
 
     updated_count = 0
     no_code_count = 0
+    not_ready_count = 0
     for row in rows:
         code = s(fv(row, "网站代码", ""))
         if not code:
             no_code_count += 1
+            continue
+
+        # 网站代码里必须带序号（比如H001），只写了字母（比如单独一个"H"）
+        # 说明这个型号还没准备好上线，跳过，不生成页面
+        if not any(ch.isdigit() for ch in code):
+            not_ready_count += 1
             continue
 
         category, category_label = CATEGORY_BY_PREFIX.get(code[:1].upper(), DEFAULT_CATEGORY)
@@ -179,6 +198,8 @@ def main():
     print(f"✅ 已更新/新增 {updated_count} 个型号")
     if no_code_count:
         print(f"⚠️ 有 {no_code_count} 个型号还没填「网站代码」，已跳过")
+    if not_ready_count:
+        print(f"⚠️ 有 {not_ready_count} 个型号「网站代码」只写了字母没写序号（还没准备好上线），已跳过")
     print(f"✅ products.json 已保存到: {os.path.abspath(JSON_PATH)}")
     print("接下来用git提交、推送上线即可")
 

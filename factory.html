@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Factory — Hongtai Precision Hardware</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 <style>
   .fac-nav{display:flex; gap:10px; flex-wrap:wrap; margin:24px 0 48px;}
@@ -32,12 +32,13 @@
       <span>Hongtai<span class="sub" style="display:block;margin-top:2px;">Precision Hardware</span></span>
     </a>
     <nav class="nav-links">
-      <a href="category.html?type=hinge">Catalog</a>
+      <a href="index.html#catalog">Catalog</a>
       <a href="factory.html">Factory</a>
       <a href="catalog-pdf.html">Catalog PDF</a>
+      <a href="packaging.html">Packaging</a>
       <a href="index.html#contact">Contact</a>
     </nav>
-    <a class="btn ghost" href="index.html#contact">Request a quote</a>
+    <a class="btn ghost" id="quote-btn-top" href="#" target="_blank" rel="noopener">Request a quote</a>
   </div>
 </header>
 
@@ -67,8 +68,13 @@
       </div>
       <div>
         <h4>Contact</h4>
+        <p>Melody — Sales Manager</p>
         <p>WhatsApp: +86 18320561551</p>
         <p>Email: melody_rongxinghardware@hotmail.com</p>
+        <div class="qr-row">
+          <figure><img src="assets/contact/whatsapp-qr.png" alt="WhatsApp QR" loading="lazy" onerror="this.closest('figure').style.display=\'none\'"><figcaption>WhatsApp</figcaption></figure>
+          <figure><img src="assets/contact/wechat-qr.png" alt="WeChat QR" loading="lazy" onerror="this.closest('figure').style.display=\'none\'"><figcaption>WeChat</figcaption></figure>
+        </div>
       </div>
     </div>
     <div style="align-self:flex-end;font-family:var(--mono);">© Hongtai Precision Hardware</div>
@@ -76,6 +82,12 @@
 </footer>
 
 <script>
+  const WHATSAPP_NUMBER = "8618320561551";
+  function waLink(text) {
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  }
+  document.getElementById("quote-btn-top").href = waLink("Hi Hongtai, I'd like a quote.");
+
   function embedUrl(video) {
     if (!video || !video.id || video.id.startsWith('替换')) return null;
     if (video.platform === 'youtube') return `https://www.youtube-nocookie.com/embed/${video.id}`;

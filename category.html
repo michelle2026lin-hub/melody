@@ -5,14 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="page-title">Category — Hongtai Precision Hardware</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 <style>
   .state-msg{font-family:var(--mono); font-size:13px; color:var(--text-2); padding:60px 0; text-align:center;}
-  /* ✅ 新增：分类页卡片缩略图的基础样式 */
-  .cat-card-thumb{width:100%; aspect-ratio:4/3; overflow:hidden; background:var(--bg-panel, #f2f2f2); margin-bottom:12px;}
-  .cat-card-thumb img{width:100%; height:100%; object-fit:cover; display:block;}
-  .cat-card-thumb-empty{display:flex; align-items:center; justify-content:center;}
 </style>
 </head>
 <body>
@@ -24,12 +20,13 @@
       <span>Hongtai<span class="sub" style="display:block;margin-top:2px;">Precision Hardware</span></span>
     </a>
     <nav class="nav-links">
-      <a href="category.html?type=hinge">Hinges</a>
-      <a href="category.html?type=slide">Slides</a>
-      <a href="category.html?type=stopper">Door Stopper</a>
+      <a href="index.html#catalog">Catalog</a>
+      <a href="factory.html">Factory</a>
+      <a href="catalog-pdf.html">Catalog PDF</a>
+      <a href="packaging.html">Packaging</a>
       <a href="index.html#contact">Contact</a>
     </nav>
-    <a class="btn ghost" href="index.html#contact">Request a quote</a>
+    <a class="btn ghost" id="quote-btn-top" href="#" target="_blank" rel="noopener">Request a quote</a>
   </div>
 </header>
 
@@ -60,8 +57,13 @@
       </div>
       <div>
         <h4>Contact</h4>
+        <p>Melody — Sales Manager</p>
         <p>WhatsApp: +86 18320561551</p>
         <p>Email: melody_rongxinghardware@hotmail.com</p>
+        <div class="qr-row">
+          <figure><img src="assets/contact/whatsapp-qr.png" alt="WhatsApp QR" loading="lazy" onerror="this.closest('figure').style.display='none'"><figcaption>WhatsApp</figcaption></figure>
+          <figure><img src="assets/contact/wechat-qr.png" alt="WeChat QR" loading="lazy" onerror="this.closest('figure').style.display='none'"><figcaption>WeChat</figcaption></figure>
+        </div>
       </div>
     </div>
     <div style="align-self:flex-end;font-family:var(--mono);">© Hongtai Precision Hardware</div>
@@ -69,6 +71,12 @@
 </footer>
 
 <script>
+  const WHATSAPP_NUMBER = "8618320561551";
+  function waLink(text) {
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  }
+  document.getElementById("quote-btn-top").href = waLink("Hi Hongtai, I'd like a quote.");
+
   const params = new URLSearchParams(window.location.search);
   const type = params.get("type") || "hinge";
   const cidParam = params.get("cid"); // preserved and passed through to each product link if present
@@ -77,13 +85,17 @@
   const crumbEl = document.getElementById("crumb-name");
   const eyebrowEl = document.getElementById("cat-eyebrow");
 
+  // keep in sync with CATEGORY_BY_PREFIX in sync_products_from_feishu.py
   const LABELS = {
     hinge: "Hinges",
     slide: "Drawer Slides",
-    stopper: "Door Stopper",
-    gasspring: "Gas Spring / Lift",
+    undermount: "Undermount Slides",
     tandembox: "Tandem Box / Slim Box",
-    pushcatcher: "Push Catcher"
+    gasspring: "Gas Spring / Lift",
+    stopper: "Door Stopper",
+    doorhinge: "Door Hinge",
+    pushcatcher: "Push Catcher",
+    misc: "Misc Hardware"
   };
 
   fetch("assets/data/products.json")
@@ -106,8 +118,8 @@
 
       grid.innerHTML = items.map(([key, m]) => {
         const link = `product.html?model=${key}${cidParam ? `&cid=${cidParam}` : ""}`;
-        // ✅ 新增：缩略图，取这个型号images数组里的第一张，
-        // 路径规则跟product.html一致：assets/{key}/{filename}
+        // thumbnail: first image in this model's images array
+        // path rule matches product.html: assets/{key}/{filename}
         const thumb = (m.images && m.images[0]) ? `assets/${key}/${m.images[0]}` : "";
         return `
           <a class="cat-card" href="${link}">

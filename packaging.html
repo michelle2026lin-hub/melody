@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Packaging — Hongtai Precision Hardware</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  .state-msg{font-family:var(--mono); font-size:13px; color:var(--text-2); padding:60px 0; text-align:center;}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a href="index.html" class="brand">
+      <span class="mark">HT</span>
+      <span>Hongtai<span class="sub" style="display:block;margin-top:2px;">Precision Hardware</span></span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html#catalog">Catalog</a>
+      <a href="factory.html">Factory</a>
+      <a href="catalog-pdf.html">Catalog PDF</a>
+      <a href="packaging.html">Packaging</a>
+      <a href="index.html#contact">Contact</a>
+    </nav>
+    <a class="btn ghost" id="quote-btn-top" href="#" target="_blank" rel="noopener">Request a quote</a>
+  </div>
+</header>
+
+<div class="wrap breadcrumb">
+  <a href="index.html">Home</a> / Packaging
+</div>
+
+<section class="section" style="padding-bottom:0;">
+  <div class="wrap">
+    <div class="eyebrow">Ready to ship</div>
+    <h2 style="font-family:var(--display);font-size:30px;margin:14px 0 0;">Packaging we've done for customers.</h2>
+    <p style="color:var(--text-1);max-width:56ch;font-size:14.5px;margin-top:10px;">Carton styles, labeling and private-label packaging from past orders — tell us your market's requirements and we'll match it.</p>
+  </div>
+</section>
+
+<div class="wrap" id="pack-content" style="padding:24px 0 80px;">
+  <div class="state-msg">Loading…</div>
+</div>
+
+<footer class="site-footer" id="contact">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h4>Company</h4>
+        <p>Guangdong Hongtai Precision Hardware Co., Ltd</p>
+        <p>Pandong Chengxi Community, Jieyang Industrial Transfer Industrial Park</p>
+        <p>Jieyang, Guangdong, China</p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <p>Melody — Sales Manager</p>
+        <p>WhatsApp: +86 18320561551</p>
+        <p>Email: melody_rongxinghardware@hotmail.com</p>
+        <div class="qr-row">
+          <figure><img src="assets/contact/whatsapp-qr.png" alt="WhatsApp QR" loading="lazy" onerror="this.closest('figure').style.display='none'"><figcaption>WhatsApp</figcaption></figure>
+          <figure><img src="assets/contact/wechat-qr.png" alt="WeChat QR" loading="lazy" onerror="this.closest('figure').style.display='none'"><figcaption>WeChat</figcaption></figure>
+        </div>
+      </div>
+    </div>
+    <div style="align-self:flex-end;font-family:var(--mono);">© Hongtai Precision Hardware</div>
+  </div>
+</footer>
+
+<script>
+  const WHATSAPP_NUMBER = "8618320561551";
+  function waLink(text) {
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  }
+  document.getElementById("quote-btn-top").href = waLink("Hi Hongtai, I'd like a quote.");
+
+  // packaging.json format: [{ "image": "assets/packaging/01.jpg", "caption": "Carton for India order, Aug 2026" }, ...]
+  fetch('assets/data/packaging.json')
+    .then(r => r.json())
+    .then(items => {
+      const content = document.getElementById('pack-content');
+      if (!items || items.length === 0) {
+        content.innerHTML = '<div class="state-msg">No packaging photos yet.</div>';
+        return;
+      }
+      content.innerHTML = `<div class="pack-grid">${items.map(it => `
+        <div>
+          <div class="pack-card"><img src="${it.image}" alt="${it.caption || 'Packaging photo'}" loading="lazy"></div>
+          ${it.caption ? `<div class="pack-caption">${it.caption}</div>` : ''}
+        </div>
+      `).join('')}</div>`;
+    })
+    .catch(() => {
+      document.getElementById('pack-content').innerHTML =
+        '<div class="state-msg">Could not load packaging photos.</div>';
+    });
+</script>
+</body>
+</html>
