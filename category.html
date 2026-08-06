@@ -105,7 +105,18 @@
     .then(data => {
       const items = Object.entries(data)
         .filter(([key]) => !key.startsWith("_"))
-        .filter(([, m]) => (m.category || "hinge") === type);
+        .filter(([, m]) => (m.category || "hinge") === type)
+        .sort((a, b) => {
+          // natural sort so H2 < H10 < H27, not lexicographic "H10" < "H2"
+          const parse = (k) => {
+            const m = k.match(/^([A-Za-z]*)(\d*)/);
+            return [m[1], parseInt(m[2] || "0", 10)];
+          };
+          const [aLetters, aNum] = parse(a[0]);
+          const [bLetters, bNum] = parse(b[0]);
+          if (aLetters !== bLetters) return aLetters.localeCompare(bLetters);
+          return aNum - bNum;
+        });
 
       const label = LABELS[type] || type;
       titleEl.textContent = label;
