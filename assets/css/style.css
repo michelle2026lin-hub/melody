@@ -105,17 +105,18 @@ img{max-width:100%;display:block;}
   border-top:1px solid var(--line); margin-top:120px;
   padding:48px 0; color:var(--text-2); font-size:13px;
 }
-.site-footer .wrap{display:flex; flex-direction:column; gap:36px;}
+.site-footer .wrap{display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; align-items:flex-end;}
 .site-footer .cols{display:flex; gap:56px; flex-wrap:wrap;}
 .site-footer h4{font-family:var(--mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-1); margin:0 0 12px;}
 .site-footer p{margin:4px 0;}
 
-/* QR codes + copyright: centered under the company/contact row */
-.qr-row{display:flex; gap:16px; justify-content:center;}
+/* right side of the footer: QR codes stacked above the copyright line */
+.footer-right{display:flex; flex-direction:column; align-items:flex-end; gap:18px;}
+.qr-row{display:flex; gap:16px;}
 .qr-row figure{margin:0; text-align:center;}
-.qr-row img{width:100px; height:100px; background:#fff; padding:5px; border:1px solid var(--line-strong);}
+.qr-row img{width:92px; height:92px; background:#fff; padding:5px; border:1px solid var(--line-strong);}
 .qr-row figcaption{font-family:var(--mono); font-size:11px; color:var(--text-2); margin-top:6px;}
-.footer-copyright{font-family:var(--mono); text-align:center; color:var(--text-2);}
+.footer-copyright{font-family:var(--mono);}
 
 /* small round icon buttons for WhatsApp / WeChat direct links */
 .icon-btn-row{display:flex; gap:12px;}
